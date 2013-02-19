@@ -12,6 +12,7 @@ install_requires = [
     'docopt',
     'sh',
     'GitPython > 0.3',
+    'Sphinx',
 ]
 
 
