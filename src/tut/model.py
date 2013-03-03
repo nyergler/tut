@@ -24,6 +24,30 @@ class Tut(object):
         if os.path.exists(os.path.join(self.__path, '.git')):
             self.__repo = Repo(self.__path)
 
+    def _git_dir(self):
+        """Return the actual location of the git dir for the repo.
+
+        For submodules, this may be nested in a parent .git directory.
+
+        """
+
+        dotgit = os.path.join(self.__path, '.git')
+        assert os.path.exists(dotgit)
+
+        if os.path.isdir(dotgit):
+            return dotgit
+
+        # .git is a file, which means we're probably in a submodule.
+        with file(dotgit, 'r') as gitfile:
+            for line in gitfile:
+                if line.startswith('gitdir: '):
+                    return os.path.join(
+                        self.__path,
+                        line.strip().split('gitdir: ', 1)[1]
+                    )
+
+        raise Exception("Could not determine the location of the git repo.")
+
     def init(self):
         """Create a new repository with an initial commit."""
 
@@ -61,7 +85,7 @@ class Tut(object):
         if hook_target:
             os.symlink(
                 os.path.abspath(hook_target),
-                os.path.join(self.__path, '.git', 'hooks', 'post-rewrite'),
+                os.path.join(self._git_dir(), 'hooks', 'post-rewrite'),
             )
 
     def points(self):
