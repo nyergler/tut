@@ -11,7 +11,6 @@ version = '0.0.1'
 install_requires = [
     'docopt',
     'sh',
-    'GitPython > 0.3',
     'Sphinx',
 ]
 

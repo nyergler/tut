@@ -1,7 +1,6 @@
 import os
 import sys
 
-from git import Repo
 from sh import (
     git,
     which,
@@ -20,9 +19,6 @@ class Tut(object):
 
     def __init__(self, path):
         self.__path = path
-
-        if os.path.exists(os.path.join(self.__path, '.git')):
-            self.__repo = Repo(self.__path)
 
     def _git_dir(self):
         """Return the actual location of the git dir for the repo.
@@ -48,6 +44,18 @@ class Tut(object):
 
         raise Exception("Could not determine the location of the git repo.")
 
+    def _repo_dirty(self):
+        """Return True if the repository is dirty."""
+
+        UNCHANGED_STATUSES = (' ', '?', '!')
+
+        for status_line in git.status(porcelain=True):
+            if not(status_line[0] in UNCHANGED_STATUSES and
+                   status_line[1] in UNCHANGED_STATUSES):
+                return True
+
+        return False
+
     def init(self):
         """Create a new repository with an initial commit."""
 
@@ -62,7 +70,6 @@ class Tut(object):
         )
 
         os.chdir(cwd)
-        self.__repo = Repo(self.__path)
 
     def install_hooks(self):
         """Install git hooks for tut."""
@@ -100,10 +107,17 @@ class Tut(object):
 
         return tut_points
 
+    def _branches(self):
+
+        return [
+            b.split()[-1].strip()
+            for b in git.branch('-q')
+        ]
+
     def _editting(self, name):
         """Return True if an edit is in progress for point_name."""
 
-        return hasattr(self.__repo.heads, branch_name(name))
+        return branch_name(name) in self._branches()
 
     def _commit_all_and_tag(self, message, tag_name, force=False):
         """Commit all changes in the working tree and tag with tag_name."""
@@ -140,7 +154,7 @@ class Tut(object):
             raise Exception("Unknown checkpoint.")
 
         # make sure the repo is clean
-        if self.__repo.is_dirty():
+        if self._repo_dirty():
             raise Exception("Dirty tree.")
 
         # create a new branch to contain editing
