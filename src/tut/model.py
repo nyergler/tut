@@ -27,12 +27,17 @@ class Tut(object):
     def init(self):
         """Create a new repository with an initial commit."""
 
+        cwd = os.getcwd()
+
         git.init(self.__path)
+
+        os.chdir(self.__path)
         git.commit(
             m='Initializing empty Tut project.',
             allow_empty=True,
         )
 
+        os.chdir(cwd)
         self.__repo = Repo(self.__path)
 
     def install_hooks(self):
