@@ -19,7 +19,10 @@ import sys
 from docopt import docopt
 
 import tut
-from tut.model import Tut
+from tut.model import (
+    Tut,
+    TutException,
+)
 
 
 def init(args):
@@ -70,11 +73,15 @@ CMD_MAP = {
 
 def main():
     arguments = docopt(__doc__, version='Tut %s' % tut.version())
-    #print arguments
 
     for cmd in CMD_MAP:
         if arguments.get(cmd):
-            CMD_MAP[cmd](arguments)
+            try:
+                CMD_MAP[cmd](arguments)
+            except TutException, e:
+                print "Error: %s" % e
+                sys.exit(1)
+
             break
 
 

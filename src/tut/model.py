@@ -15,6 +15,10 @@ def branch_name(tag_or_point):
     return BRANCH_PREFIX + tag_or_point
 
 
+class TutException(Exception):
+    pass
+
+
 class Tut(object):
 
     def __init__(self, path):
@@ -42,7 +46,7 @@ class Tut(object):
                         line.strip().split('gitdir: ', 1)[1]
                     )
 
-        raise Exception("Could not determine the location of the git repo.")
+        raise TutException("Could not determine the location of the git repo.")
 
     def _repo_dirty(self):
         """Return True if the repository is dirty."""
@@ -146,7 +150,7 @@ class Tut(object):
             if self._editting(name):
                 return self.finish_edit(name, message)
             else:
-                raise Exception("Point already exists")
+                raise TutException("Point already exists")
 
         if message is None:
             # generate a default message
@@ -158,17 +162,17 @@ class Tut(object):
         """Start editing the checkpoint point_name."""
 
         if not self._hooks_installed():
-            raise Exception(
+            raise TutException(
                 "Tut hook not installed; do you need to run tut init?"
             )
 
         # make sure this is a known checkpoint
         if name not in self.points():
-            raise Exception("Unknown checkpoint.")
+            raise TutException("Unknown checkpoint.")
 
         # make sure the repo is clean
         if self._repo_dirty():
-            raise Exception("Dirty tree.")
+            raise TutException("Dirty tree.")
 
         # create a new branch to contain editing
         git.checkout(
