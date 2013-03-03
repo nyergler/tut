@@ -56,6 +56,14 @@ class Tut(object):
 
         return False
 
+    def _hooks_installed(self):
+        """Return True if the tut hooks are installed in the Repo."""
+
+        # right now just make sure some post-rewrite hook is installed
+        return os.path.exists(
+            os.path.join(self._git_dir(), 'hooks', 'post-rewrite')
+        )
+
     def init(self):
         """Create a new repository with an initial commit."""
 
@@ -148,6 +156,11 @@ class Tut(object):
 
     def edit(self, name):
         """Start editing the checkpoint point_name."""
+
+        if not self._hooks_installed():
+            raise Exception(
+                "Tut hook not installed; do you need to run tut init?"
+            )
 
         # make sure this is a known checkpoint
         if name not in self.points():
