@@ -67,13 +67,23 @@ class TutCheckpoint(Directive):
         return []
 
 
+def initialize(app):
+
+    global _RESET_PATHS
+    _RESET_PATHS = {}
+
+
 def cleanup(app, exception):
 
-    global __RESET_PATHS
+    global _RESET_PATHS
 
-    for path in _RESET_PATHS:
-        os.chdir(path)
-        git.checkout(_RESET_PATHS[path])
+    curdir = os.getcwd()
+    try:
+        for path in _RESET_PATHS:
+            os.chdir(path)
+            git.checkout(_RESET_PATHS[path])
+    finally:
+        os.chdir(curdir)
 
 
 def setup(app):
@@ -81,4 +91,5 @@ def setup(app):
     app.add_directive('tut', TutDefaults)
     app.add_directive('checkpoint', TutCheckpoint)
 
+    app.connect('builder-inited', initialize)
     app.connect('build-finished', cleanup)
