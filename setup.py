@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.0.1'
+version = '0.1'
 
 install_requires = [
     'docopt',
@@ -24,8 +24,8 @@ setup(name='tut',
       keywords='',
       author='Nathan Yergler',
       author_email='nathan@yergler.net',
-      url='',
-      license='',
+      url='http://github.com/nyergler/tut',
+      license='BSD',
       packages=find_packages('src'),
       package_dir={'': 'src'},
       include_package_data=True,
