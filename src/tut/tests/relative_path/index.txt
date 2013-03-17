@@ -1,0 +1,10 @@
+==================
+Relative Path Test
+==================
+
+Test Document
+
+.. checkpoint:: step_one
+   :path: src
+
+Further content

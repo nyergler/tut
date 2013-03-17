@@ -1,0 +1,12 @@
+.. tut::
+   :path: /src
+
+==================
+Tut Directive Test
+==================
+
+Test Document
+
+.. checkpoint:: step_one
+
+Further content
