@@ -46,11 +46,10 @@ class TutCheckpoint(Directive):
             raise Exception("No tut path specified.")
 
         # paths are relative to the project root
-        if tut_path[0] == '/':
-            tut_path = tut_path[1:]
+        rel_path, tut_path = self.state.document.settings.env.relfn2path(
+            tut_path)
 
         curdir = os.getcwd()
-        tut_path = os.path.join(curdir, tut_path)
         os.chdir(tut_path)
 
         # if this is the first time visiting this repo
