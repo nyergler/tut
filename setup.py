@@ -34,7 +34,6 @@ setup(name='tut',
       entry_points={
           'console_scripts': [
               'tut=tut.cmd:main',
-              'tut_remap=tut.cmd:post_rewrite',
           ],
       },
 )

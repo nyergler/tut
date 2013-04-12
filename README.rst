@@ -10,11 +10,14 @@ one another, and include code examples along the way. *Tut* helps you
 manage the code in the tutorial as you write it, and include the
 correct segments in your document.
 
-Tut makes it easy to manage tags_ in a git_ source repository, and
-include code from a specific tag (or branch or commit) in your Sphinx
-document using the built-in literalinclude_ directive. Tut consists of
-two pieces: a program to manage tags, and a Sphinx extension to switch
-tags during the Sphinx build.
+Tut makes it easy to manage a git_ source repository for your
+tutorial's code by using branches_ to record different steps. As you
+write the code for your tutorial, Tut lets you include code from a
+particular branch (or tag or commit) in your Sphinx document using the
+built-in literalinclude_ directive.
+
+Tut consists of two pieces: a program to manage branches, and a Sphinx
+extension to switch branches during the Sphinx build.
 
 Including Code in Sphinx
 ========================
@@ -67,34 +70,28 @@ checkout`` in target repository. This means that the repository should
 not contain uncommitted changes, to avoid errors on checkout.
 
 
-Managing Tags
-=============
+Managing Branches
+=================
 
-In addition to making it easy to switch between tags in your source
-repository, **Tut** provides a tool for managing those tags. The
-primary advantage of using Tut to manage your tags is that it provides
-support for rolling back history to make changes, and keeping
-subsequent tags intact.
+In addition to making it easy to switch between branches or tags in
+your source, **Tut** provides a tool for managing branches in the
+repository. Tutorials usually have "steps" -- discreet units that
+build upon previous ones -- and Tut models those as branches\ [1]_.
+Each step's branch forks from the previous step's branch. Note that
+use of the Tut command line tool is completely optional: Tut works
+great with Sphinx and git on their own.
 
 To start using Tut, run ``tut init <path>``::
 
   $ tut init ./demosrc
 
-If the path (``./demosrc``) is an existing git repository, Tut will
-install its `post-rewrite`_ hook. If it is not an existing repository,
-Tut will create the repository, install the hook, and add a first
-commit.
+If the path (``./demosrc``) is not an existing git repository, Tut
+will initialize one and add an initial commit.
 
-When you've made some changes and want to create a checkpoint, simple
-run ``tut checkpoint``::
+When you want to start a new step (checkpoint) starting from the one
+you're currently on, run ``tut start``::
 
-  $ tut checkpoint step_one
-
-You can optionally specify a commit message::
-
-  $ tut checkpoint step_one -m "The first checkpoint."
-
-Under the hood, Tut is executing something like ``git commit -a``.
+  $ tut start step_one
 
 After you've made checkpoints in your repository, you can run ``tut
 points`` to list the checkpoints::
@@ -108,19 +105,24 @@ earlier checkpoint, simply run ``tut edit``::
 
   $ tut edit step_one
 
-Tut will roll back your repository to the ``step_one`` tag, and put
-you on a branch for editing. Once you've finished editing, commit the
-changes using ``tut checkpoint`` again::
+Tut will check out the ``step_one`` branch, and you can make changes
+and commit them. Once you're done editing, you'll want to roll those
+changes forward, through the subsequent steps.
 
-  $ tut checkpoint step_one -m "Edited Step One."
+::
 
-Tut will commit your changes, and then apply the future changes on top
-of them. The Tut post-rewrite hook will ensure that the tags
-(checkpoints) that come after ``step_one`` are updated to reflect
-their new SHAs.
+  $ tut next --merge
+
+Running ``tut next`` will find the next step and check out that
+branch. Adding ``--merge`` will also merge the previous step. If we're
+done making changes to ``step_one``, running ``tut next --merge`` will
+move us to ``step_two`` and merge ``step_one``.
+
+.. [1] Tut 0.1 modeled these as tags, but after some experience with
+   managing third party contributions, branches appear to be more
+   flexible and useful.
 
 .. _Sphinx: http://sphinx-doc.org/
-.. _tags: http://git-scm.com/book/en/Git-Basics-Tagging
+.. _branches: http://git-scm.com/book/en/Git-Branching-Basic-Branching-and-Merging
 .. _git: http://git-scm.org/
-.. _`post-rewrite`: https://www.kernel.org/pub/software/scm/git/docs/githooks.html
 .. _literalinclude: http://sphinx-doc.org/markup/code.html#directive-literalinclude

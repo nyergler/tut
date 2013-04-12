@@ -2,9 +2,10 @@
 
 Usage:
   tut init [<path>]
+  tut start <name>
   tut points
-  tut checkpoint <name> [-m <message>]
   tut edit <name>
+  tut next [--merge]
 
 Options:
   -h --help     Show this screen.
@@ -37,23 +38,17 @@ def init(args):
 
     if not os.path.exists(os.path.join(path, '.git')):
         tut_repo.init()
-    tut_repo.install_hooks()
+
+
+def start(args):
+
+    Tut(os.getcwd()).start(args['<name>'])
 
 
 def points(args):
 
     for point in Tut(os.getcwd()).points():
         print point
-
-
-def checkpoint(args):
-
-    point = Tut(os.getcwd()).checkpoint(
-        args['<name>'],
-        message=args.get('<message>'),
-    )
-
-    print "Recorded checkpoint: %s" % point
 
 
 def edit(args):
@@ -63,11 +58,17 @@ def edit(args):
     )
 
 
+def next_step(args):
+
+    Tut(os.getcwd()).next(merge=args.get('--merge'))
+
+
 CMD_MAP = {
+    'start': start,
     'init': init,
     'points': points,
-    'checkpoint': checkpoint,
     'edit': edit,
+    'next': next_step,
 }
 
 

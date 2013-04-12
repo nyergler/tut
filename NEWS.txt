@@ -7,6 +7,11 @@ News
 
 *Release date: UNRELEASED*
 
+* BACKWARDS INCOMPATIBLE
+* Removed post-rewrite hook, ``tut-remap``
+* Moved from tag-based checkpoints to branch-based
+* Added ``next`` sub-command to move from one step to the next
+* ``edit`` now checks out a branch
 
 0.1
 ---
