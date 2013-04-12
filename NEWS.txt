@@ -2,6 +2,12 @@
 News
 ====
 
+Development
+-----------
+
+*Release date: UNRELEASED*
+
+
 0.2
 ---
 
