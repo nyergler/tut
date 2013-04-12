@@ -5,7 +5,7 @@ News
 0.2
 ---
 
-*Release date: UNRELEASED*
+*Release date: 11 April 2013*
 
 * BACKWARDS INCOMPATIBLE
 * Removed post-rewrite hook, ``tut-remap``
