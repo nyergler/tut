@@ -26,7 +26,7 @@ from tut.model import (
 )
 
 
-def init(args):
+def init(tut, args):
 
     path = args.get('<path>')
     if path is None:
@@ -40,27 +40,27 @@ def init(args):
         tut_repo.init()
 
 
-def start(args):
+def start(tut, args):
 
-    Tut(os.getcwd()).start(args['<name>'])
+    tut.start(args['<name>'])
 
 
-def points(args):
+def points(tut, args):
 
-    for point in Tut(os.getcwd()).points():
+    for point in tut.points():
         print point
 
 
-def edit(args):
+def edit(tut, args):
 
-    Tut(os.getcwd()).edit(
+    tut.edit(
         args['<name>'],
     )
 
 
-def next_step(args):
+def next_step(tut, args):
 
-    Tut(os.getcwd()).next(merge=args.get('--merge'))
+    tut.next(merge=args.get('--merge'))
 
 
 CMD_MAP = {
@@ -78,7 +78,10 @@ def main():
     for cmd in CMD_MAP:
         if arguments.get(cmd):
             try:
-                CMD_MAP[cmd](arguments)
+                CMD_MAP[cmd](
+                    Tut(os.getcwd()),
+                    arguments,
+                )
             except TutException, e:
                 print "Error: %s" % e
                 sys.exit(1)
