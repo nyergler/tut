@@ -2,6 +2,7 @@
 
 Usage:
   tut init [<path>]
+  tut fetch <remote>
   tut start <name>
   tut points
   tut edit <name>
@@ -40,6 +41,16 @@ def init(tut, args):
         tut_repo.init()
 
 
+def fetch(tut, args):
+
+    remote = args.get('<remote>')
+
+    for point in tut.points(remote):
+        tut.start(
+            point.split('/')[-1],
+            starting_point=point,
+        )
+
 def start(tut, args):
 
     tut.start(args['<name>'])
@@ -69,6 +80,7 @@ CMD_MAP = {
     'points': points,
     'edit': edit,
     'next': next_step,
+    'fetch': fetch,
 }
 
 
