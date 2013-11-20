@@ -36,4 +36,8 @@ setup(name='tut',
               'tut=tut.cmd:main',
           ],
       },
+      tests_require=[
+          'mock',
+      ],
+      test_suite='tut.tests',
 )
