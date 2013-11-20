@@ -1,4 +1,5 @@
 import os
+from os import chdir as _chdir
 from unittest import TestCase
 
 from mock import patch
@@ -8,7 +9,7 @@ from tut.tests import util
 from tut.tests.util import with_sphinx
 
 
-@patch('os.chdir', new=lambda x:None)
+@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
 @patch('tut.sphinx.git', return_value='original_branch')
 class SphinxExtensionLifecycleTests(TestCase):
 
@@ -38,7 +39,7 @@ class SphinxExtensionLifecycleTests(TestCase):
         self.assertEqual(start_dir, os.getcwd())
 
 
-@patch('os.chdir', new=lambda x:None)
+@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
 @patch('tut.sphinx.git')
 class TutDirectiveTests(TestCase):
 
@@ -62,7 +63,7 @@ class TutDirectiveTests(TestCase):
         sphinx_app.builder.cleanup()
 
 
-@patch('os.chdir', new=lambda x:None)
+@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
 @patch('tut.sphinx.git')
 class CheckpointDirectiveTests(TestCase):
 
