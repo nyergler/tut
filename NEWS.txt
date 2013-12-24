@@ -7,6 +7,7 @@ Development
 
 *Release date: UNRELEASED*
 
+* Updated to support Sphinx 1.2
 * Added ``tut fetch`` to support retreiving all checkpoints.
 
 0.2
