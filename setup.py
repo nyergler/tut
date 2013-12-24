@@ -12,6 +12,7 @@ install_requires = [
     'docopt',
     'sh',
     'Sphinx',
+    'six',
 ]
 
 
