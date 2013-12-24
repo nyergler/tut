@@ -2,6 +2,13 @@
  Tut
 =====
 
+.. image:: https://travis-ci.org/nyergler/tut.png
+   :target: https://travis-ci.org/nyergler/tut
+
+.. image:: https://coveralls.io/repos/nyergler/tut/badge.png?branch=master
+   :target: https://coveralls.io/r/nyergler/tut?branch=master
+
+
 **Tut** is a tool that helps you write tutorial style documentation
 using Sphinx_.
 
