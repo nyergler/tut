@@ -120,3 +120,22 @@ class CheckpointDirectiveTests(TestCase):
         # cleanup
         sphinx_app.cleanup()
         sphinx_app.builder.cleanup()
+
+@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
+class CheckpointDirectiveWithLiveGitTests(TestCase):
+
+    @with_sphinx(srcdir=util.test_root.parent/'abs_path')
+    def test_invalid_checkpoint(self, sphinx_app=None):
+        """Invalid checkpoint names return helpful error message."""
+
+        with self.assertRaises(ValueError) as git_error:
+            sphinx_app.builder.build_all()
+
+        self.assertEqual(
+            str(git_error.exception),
+            "git checkpoint 'step_one' does not exist.",
+        )
+
+        # cleanup
+        sphinx_app.cleanup()
+        sphinx_app.builder.cleanup()

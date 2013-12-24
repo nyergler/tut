@@ -9,6 +9,7 @@ Development
 
 * Updated to support Sphinx 1.2
 * Added ``tut fetch`` to support retreiving all checkpoints.
+* Better error reporting when calling git fails.
 
 0.2
 ---
