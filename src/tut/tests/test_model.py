@@ -9,7 +9,7 @@ from sh import git
 import tut.model
 
 
-class TutPointTests(unittest.TestCase):
+class TutTests(unittest.TestCase):
 
     def setUp(self):
 
@@ -72,3 +72,12 @@ class TutPointTests(unittest.TestCase):
 
     def test_start_inserts_branch_after_last(self):
         pass
+
+    def test_current(self):
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        self.assertEqual(t.current(), 'master')
+
+        t.start('step1')
+        self.assertEqual(t.current(), 'step1')

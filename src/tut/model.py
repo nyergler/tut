@@ -102,6 +102,7 @@ class Tut(object):
 
         return self._config()['points']
 
+    @with_path
     def current(self):
         """Return the name of the current step."""
 
