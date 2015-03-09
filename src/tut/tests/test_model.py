@@ -9,7 +9,7 @@ from sh import git
 import tut.model
 
 
-class TutTests(unittest.TestCase):
+class TutTestCase(unittest.TestCase):
 
     def setUp(self):
 
@@ -27,6 +27,9 @@ class TutTests(unittest.TestCase):
         # return to the original working directory
         os.chdir(self._original_path)
 
+
+class TutInitTests(TutTestCase):
+
     def test_init_creates_empty_pointfile(self):
 
         t = tut.model.Tut(self._testpath)
@@ -38,6 +41,17 @@ class TutTests(unittest.TestCase):
             'points: []',
         )
 
+    def test_current(self):
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        self.assertEqual(t.current(), 'master')
+
+        t.start('step1')
+        self.assertEqual(t.current(), 'step1')
+
+
+class TutPointsTests(TutTestCase):
     def test_points_returns_contents_of_pointfile(self):
         t = tut.model.Tut(self._testpath)
         t.init()
@@ -48,6 +62,9 @@ class TutTests(unittest.TestCase):
         t.start('step2')
 
         self.assertEqual(t.points(), ['step1', 'step2'])
+
+
+class TutStartEditTests(TutTestCase):
 
     def test_start_adds_name_to_pointfile(self):
         t = tut.model.Tut(self._testpath)
