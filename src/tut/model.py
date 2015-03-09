@@ -57,7 +57,7 @@ class Tut(object):
             git.checkout('tut')
             yaml.dump(
                 config,
-                file('tut.cfg', 'w'),
+                open('tut.cfg', 'w'),
                 default_flow_style=False,
             )
             git.add('tut.cfg')
