@@ -148,3 +148,24 @@ class TutStartEditTests(TutTestCase):
              'step4',
             ],
         )
+
+
+class TutNextTests(TutTestCase):
+
+    def test_next_checks_out_next_in_list(self):
+
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        # create three steps
+        t.start('step1')
+        t.start('step2')
+        t.start('step3')
+
+        t.edit('step1')
+
+        self.assertEqual(t._current_branch(), 'step1')
+
+        t.next()
+        self.assertEqual(t._current_branch(), 'step2')
+        self.assertEqual(t.current(), 'step2')

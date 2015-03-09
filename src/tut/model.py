@@ -168,6 +168,7 @@ class Tut(object):
 
         git.checkout(name)
 
+    @with_path
     def next(self, merge=False):
         current = self.current()
 
