@@ -62,7 +62,13 @@ class TutPointTests(unittest.TestCase):
         )
 
     def test_start_raises_exception_on_duplicate_name(self):
-        self.assertEqual(True, False)
+        t = tut.model.Tut(self._testpath)
+
+        t.init()
+        t.start('step1')
+
+        with self.assertRaises(tut.model.TutException):
+            t.start('step1')
 
     def test_start_inserts_branch_after_last(self):
         pass
