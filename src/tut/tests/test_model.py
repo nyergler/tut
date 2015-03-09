@@ -39,7 +39,15 @@ class TutPointTests(unittest.TestCase):
         )
 
     def test_points_returns_contents_of_pointfile(self):
-        self.assertEqual(True, False)
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        self.assertEqual(t.points(), [])
+
+        t.start('step1')
+        t.start('step2')
+
+        self.assertEqual(t.points(), ['step1', 'step2'])
 
     def test_start_adds_name_to_pointfile(self):
         t = tut.model.Tut(self._testpath)

@@ -92,6 +92,7 @@ class Tut(object):
 
         os.chdir(cwd)
 
+    @with_path
     def points(self, remote=None):
         """Return a list of existing checkpoints (branches).
 
@@ -99,25 +100,7 @@ class Tut(object):
 
         """
 
-        RESERVED = (
-            'HEAD',
-        )
-
-        if remote is None:
-            prefix = 'refs/heads/'
-        else:
-            prefix = 'refs/remotes/%s/' % remote
-
-        return [
-            step.strip()
-            for step in git(
-                    'for-each-ref',
-                    '--sort=committerdate',
-                    prefix,
-                    '--format=%(refname:short)',
-                )
-            if not step.strip().split('/')[-1] in RESERVED
-        ]
+        return self._config()['points']
 
     def current(self):
         """Return the name of the current step."""
