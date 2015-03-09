@@ -141,10 +141,10 @@ class Tut(object):
         # add the branch to config
         config = self._config()
         points = config['points']
-        if self.current() not in points:
-            points.append(name)
-        else:
+        if self.current():
             points.insert(points.index(self.current()) + 1, name)
+        else:
+            points.append(name)
 
         self._update_config(
             config,
