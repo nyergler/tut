@@ -10,7 +10,7 @@ env:
 
 install:
   - pip install coveralls --use-mirrors
-  - pip install -q Sphinx==$SPHINX_VERSION
+  - pip install --allow-external Sphinx --allow-unverified Sphinx -q Sphinx==$SPHINX_VERSION
   - python setup.py install
 
 before_script:
