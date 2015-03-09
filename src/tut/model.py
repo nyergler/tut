@@ -51,7 +51,7 @@ class Tut(object):
 
     def _update_config(self, config, log=None):
 
-        branch = self.current()
+        branch = self._current_branch()
 
         try:
             git.checkout('tut')
@@ -102,11 +102,21 @@ class Tut(object):
 
         return self._config()['points']
 
+    def _current_branch(self):
+        """Return the current branch of the repo."""
+
+        return git('rev-parse', '--abbrev-ref', 'HEAD').strip()
+
     @with_path
     def current(self):
         """Return the name of the current step."""
 
-        return git('rev-parse', '--abbrev-ref', 'HEAD').strip()
+        current_branch = self._current_branch()
+
+        if current_branch in self.points():
+            return current_branch
+
+        return None
 
     @with_path
     def start(self, name, starting_point=None):

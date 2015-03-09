@@ -41,15 +41,6 @@ class TutInitTests(TutTestCase):
             'points: []',
         )
 
-    def test_current(self):
-        t = tut.model.Tut(self._testpath)
-        t.init()
-
-        self.assertEqual(t.current(), 'master')
-
-        t.start('step1')
-        self.assertEqual(t.current(), 'step1')
-
 
 class TutPointsTests(TutTestCase):
     def test_points_returns_contents_of_pointfile(self):
@@ -62,6 +53,25 @@ class TutPointsTests(TutTestCase):
         t.start('step2')
 
         self.assertEqual(t.points(), ['step1', 'step2'])
+
+    def test_current(self):
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        self.assertEqual(t.current(), None)
+
+        t.start('step1')
+        self.assertEqual(t.current(), 'step1')
+
+    def test_current_returns_none_on_unknown_branch(self):
+        t = tut.model.Tut(self._testpath)
+        t.init()
+        t.start('step1')
+
+        git.checkout('master')
+
+        self.assertNotIn('master', t.points())
+        self.assertEqual(t.current(), None)
 
 
 class TutStartEditTests(TutTestCase):
