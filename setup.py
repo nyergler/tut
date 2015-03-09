@@ -10,6 +10,7 @@ version = '0.3'
 
 install_requires = [
     'docopt',
+    'pyyaml',
     'sh',
     'Sphinx',
     'six',

@@ -1,6 +1,12 @@
 import os
 
 from sh import git
+import yaml
+
+
+DEFAULT_CONFIG = {
+    'points': [],
+}
 
 
 class TutException(Exception):
@@ -29,6 +35,7 @@ class Tut(object):
 
         cwd = os.getcwd()
 
+        # initialize the empty repository
         git.init(self.__path)
 
         os.chdir(self.__path)
@@ -36,6 +43,19 @@ class Tut(object):
             m='Initializing empty Tut project.',
             allow_empty=True,
         )
+
+        # create the empty configuration file
+        git.checkout('-b', 'tut')
+        yaml.dump(
+            DEFAULT_CONFIG,
+            file('tut.cfg', 'w'),
+            default_flow_style=False,
+        )
+        git.add('tut.cfg')
+        git.commit(
+            m='Initializing Tut configuration.',
+        )
+        git.checkout('master')
 
         os.chdir(cwd)
 
