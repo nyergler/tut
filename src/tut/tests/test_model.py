@@ -125,3 +125,26 @@ class TutStartEditTests(TutTestCase):
              'step3',
             ],
         )
+
+    def test_start_inserts_branch_after_last_on_master(self):
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        # create three steps
+        t.start('step1')
+        t.start('step2')
+        t.start('step3')
+
+        git.checkout('master')
+
+        # add new step between 2 and 3
+        t.start('step4')
+
+        self.assertEqual(
+            t.points(),
+            ['step1',
+             'step2',
+             'step3',
+             'step4',
+            ],
+        )
