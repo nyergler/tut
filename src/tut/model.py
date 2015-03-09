@@ -45,6 +45,29 @@ class Tut(object):
 
         return False
 
+    def _config(self):
+        data = git('--no-pager', 'show', 'tut:tut.cfg')
+        return yaml.load(data.stdout)
+
+    def _update_config(self, config, log=None):
+
+        branch = git('rev-parse', '--abbrev-ref', 'HEAD')
+
+        try:
+            git.checkout('tut')
+            yaml.dump(
+                config,
+                file('tut.cfg', 'w'),
+                default_flow_style=False,
+            )
+            git.add('tut.cfg')
+            git.commit(
+                m=log or 'Update configuration.',
+            )
+
+        finally:
+            git.checkout(branch)
+
     def init(self):
         """Create a new repository with an initial commit."""
 
@@ -52,23 +75,18 @@ class Tut(object):
 
         # initialize the empty repository
         git.init(self.path)
-
         os.chdir(self.path)
+
         git.commit(
             m='Initializing empty Tut project.',
             allow_empty=True,
         )
 
         # create the empty configuration file
-        git.checkout('-b', 'tut')
-        yaml.dump(
+        git.branch('tut')
+        self._update_config(
             DEFAULT_CONFIG,
-            file('tut.cfg', 'w'),
-            default_flow_style=False,
-        )
-        git.add('tut.cfg')
-        git.commit(
-            m='Initializing Tut configuration.',
+            log='Initializing Tut configuration.',
         )
         git.checkout('master')
 
@@ -126,16 +144,16 @@ class Tut(object):
         else:
             args = ('-b', name, starting_point, '--track')
 
-        # add the branch to config
-        git.checkout('tut')
-        config = yaml.load(file('tut.cfg', 'r').read())
-        config['points'].append(name)
-        yaml.dump(config, file('tut.cfg', 'w'), default_flow_style=False)
-        git.add('tut.cfg')
-        git.commit(m='Adding new point %s' % name)
-
         # checkout the new branch
         git.checkout(name)
+
+        # add the branch to config
+        config = self._config()
+        config['points'].append(name)
+        self._update_config(
+            config,
+            log='Adding new point %s' % name,
+        )
 
     def edit(self, name):
         """Start editing the checkpoint point_name."""
