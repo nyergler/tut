@@ -1,3 +1,4 @@
+import functools
 import os
 
 from sh import git
@@ -9,6 +10,20 @@ DEFAULT_CONFIG = {
 }
 
 
+def with_path(m):
+
+    @functools.wraps(m)
+    def _with_path(self, *args, **kwargs):
+        start_path = os.getcwd()
+        os.chdir(self.path)
+        try:
+            return m(self, *args, **kwargs)
+        finally:
+            os.chdir(start_path)
+
+    return _with_path
+
+
 class TutException(Exception):
     pass
 
@@ -16,7 +31,7 @@ class TutException(Exception):
 class Tut(object):
 
     def __init__(self, path):
-        self.__path = path
+        self.path = path
 
     def _repo_dirty(self):
         """Return True if the repository is dirty."""
@@ -36,9 +51,9 @@ class Tut(object):
         cwd = os.getcwd()
 
         # initialize the empty repository
-        git.init(self.__path)
+        git.init(self.path)
 
-        os.chdir(self.__path)
+        os.chdir(self.path)
         git.commit(
             m='Initializing empty Tut project.',
             allow_empty=True,
@@ -91,6 +106,7 @@ class Tut(object):
 
         return git('rev-parse', '--abbrev-ref', 'HEAD').strip()
 
+    @with_path
     def start(self, name, starting_point=None):
         """Start a new step (branch)."""
 
@@ -102,12 +118,24 @@ class Tut(object):
         if self._repo_dirty():
             raise TutException("Dirty tree.")
 
+        # create the new branch
+        git.branch(name)
+
         if starting_point is None:
             args = ('-b', name)
         else:
             args = ('-b', name, starting_point, '--track')
 
-        git.checkout(*args)
+        # add the branch to config
+        git.checkout('tut')
+        config = yaml.load(file('tut.cfg', 'r').read())
+        config['points'].append(name)
+        yaml.dump(config, file('tut.cfg', 'w'), default_flow_style=False)
+        git.add('tut.cfg')
+        git.commit(m='Adding new point %s' % name)
+
+        # checkout the new branch
+        git.checkout(name)
 
     def edit(self, name):
         """Start editing the checkpoint point_name."""

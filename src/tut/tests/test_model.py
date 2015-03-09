@@ -38,11 +38,23 @@ class TutPointTests(unittest.TestCase):
             'points: []',
         )
 
-    def test_points_returns_contents_of_pointfile(self, git_mock):
+    def test_points_returns_contents_of_pointfile(self):
         self.assertEqual(True, False)
 
-    def test_start_adds_name_to_pointfile(self, git_mock):
+    def test_start_adds_name_to_pointfile(self):
+        t = tut.model.Tut(self._testpath)
+
+        t.init()
+        t.start('step1')
+
+        os.chdir(self._testpath)
+        self.assertEqual(
+            git('--no-pager', 'show', 'tut:tut.cfg').strip(),
+            'points:\n- step1',
+        )
+
+    def test_start_raises_exception_on_duplicate_name(self):
         self.assertEqual(True, False)
 
-    def test_start_raises_exception_on_duplicate_name(self, git_mock):
-        self.assertEqual(True, False)
+    def test_start_inserts_branch_after_last(self):
+        pass
