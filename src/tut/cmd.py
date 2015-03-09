@@ -1,16 +1,15 @@
 """Tut.
 
 Usage:
-  tut init [<path>]     Initialize <path> as a Tut project.
-  tut fetch <remote>
-  tut start <name>      Start a new step, <name>, based on the current one.
-  tut points            List the steps, in order.
-  tut edit <name>       Begin editing the files for step <name>.
-  tut next [--merge]    Move to the next step, option merging.
+  tut init [<path>]
+  tut start <name>
+  tut points
+  tut edit <name>
+  tut next [--merge]
 
 Options:
-  -h --help             Show this screen.
-  --version             Show version.
+  -h --help     Show this screen.
+  --version     Show version.
 
 """
 
