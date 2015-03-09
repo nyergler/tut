@@ -19,6 +19,9 @@ class TutTestCase(unittest.TestCase):
         # stash the current working directory
         self._original_path = os.getcwd()
 
+        # change to the test repo path
+        os.chdir(self._testpath)
+
     def tearDown(self):
 
         # cleanup working directory
