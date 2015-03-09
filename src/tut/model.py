@@ -128,17 +128,23 @@ class Tut(object):
         else:
             args = ('-b', name, starting_point, '--track')
 
-        # checkout the new branch
-        git.checkout(name)
-
         # add the branch to config
         config = self._config()
-        config['points'].append(name)
+        points = config['points']
+        if self.current() not in points:
+            points.append(name)
+        else:
+            points.insert(points.index(self.current()) + 1, name)
+
         self._update_config(
             config,
             log='Adding new point %s' % name,
         )
 
+        # checkout the new branch
+        git.checkout(name)
+
+    @with_path
     def edit(self, name):
         """Start editing the checkpoint point_name."""
 

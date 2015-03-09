@@ -87,14 +87,28 @@ class TutStartEditTests(TutTestCase):
         with self.assertRaises(tut.model.TutException):
             t.start('step1')
 
-    def test_start_inserts_branch_after_last(self):
-        pass
-
-    def test_current(self):
+    def test_start_inserts_branch_after_current(self):
         t = tut.model.Tut(self._testpath)
         t.init()
 
-        self.assertEqual(t.current(), 'master')
-
+        # create three steps
         t.start('step1')
-        self.assertEqual(t.current(), 'step1')
+        t.start('step2')
+        t.start('step3')
+
+        t.edit('step2')
+
+        # sanity check
+        self.assertEqual(t.current(), 'step2')
+
+        # add new step between 2 and 3
+        t.start('step2a')
+
+        self.assertEqual(
+            t.points(),
+            ['step1',
+             'step2',
+             'step2a',
+             'step3',
+            ],
+        )
