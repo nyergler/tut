@@ -51,7 +51,7 @@ class Tut(object):
 
     def _update_config(self, config, log=None):
 
-        branch = git('rev-parse', '--abbrev-ref', 'HEAD')
+        branch = self.current()
 
         try:
             git.checkout('tut')
