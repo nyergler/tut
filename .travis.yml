@@ -13,6 +13,10 @@ install:
   - pip install -q Sphinx==$SPHINX_VERSION
   - python setup.py install
 
+before_script:
+  - git config --global user.email "nathan+travis@yergler.net"
+  - git config --global user.name "Travis Build"
+
 script:
   - coverage run --source=tut setup.py test
 
