@@ -7,6 +7,9 @@ Development
 
 *Release date: UNRELEASED*
 
+* Testing against Sphinx 1.3
+* Use dedicated config file on special branch for maintaining point
+  list.
 * Updated to support Sphinx 1.2
 * Added ``tut fetch`` to support retreiving all checkpoints.
 * Better error reporting when calling git fails.
