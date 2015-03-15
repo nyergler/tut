@@ -16,3 +16,4 @@ dist/
 eggs/
 *.egg
 .tox/
+/.eggs/README.txt
