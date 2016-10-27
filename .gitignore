@@ -2,9 +2,12 @@
 
 .installed.cfg
 bin/
-lib/
 include/
+lib/
+man/
+share/
 .Python
+pip-selfcheck.json
 
 develop-eggs/
 
