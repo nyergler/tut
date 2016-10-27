@@ -1,3 +1,4 @@
+from tut import version
 from tut.sphinx.checkpoint import (
     TutDefaults,
     TutCheckpoint,
@@ -13,3 +14,7 @@ def setup(app):
 
     app.connect('builder-inited', initialize)
     app.connect('build-finished', cleanup)
+
+    return {
+        'version': version(),
+    }
