@@ -19,9 +19,6 @@ class TutTestCase(unittest.TestCase):
         # stash the current working directory
         self._original_path = os.getcwd()
 
-        # change to the test repo path
-        os.chdir(self._testpath)
-
     def tearDown(self):
 
         # cleanup working directory
@@ -71,7 +68,7 @@ class TutPointsTests(TutTestCase):
         t.init()
         t.start('step1')
 
-        git.checkout('master')
+        t.checkout('master')
 
         self.assertNotIn('master', t.points())
         self.assertEqual(t.current(), None)
@@ -135,7 +132,7 @@ class TutStartEditTests(TutTestCase):
         t.start('step2')
         t.start('step3')
 
-        git.checkout('master')
+        t.checkout('master')
 
         # add new step between 2 and 3
         t.start('step4')
