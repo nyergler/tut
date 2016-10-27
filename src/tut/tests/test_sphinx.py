@@ -4,13 +4,14 @@ from unittest import TestCase
 
 from mock import patch
 
-import tut.sphinx
+import tut.sphinx.checkpoint
+
 from tut.tests import util
 from tut.tests.util import with_sphinx
 
 
 @patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.git', return_value='original_branch')
+@patch('tut.sphinx.checkpoint.git', return_value='original_branch')
 class SphinxExtensionLifecycleTests(TestCase):
 
     # the order of these decorators is *important*: cleanup needs to
@@ -40,23 +41,23 @@ class SphinxExtensionLifecycleTests(TestCase):
 
 
 @patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.git')
+@patch('tut.sphinx.checkpoint.git')
 class TutDirectiveTests(TestCase):
 
     @with_sphinx(srcdir=util.test_root.parent/'tut_directive')
     def test_set_default_path(self, git_mock, sphinx_app=None):
         """tut directive sets the default repo path."""
 
-        self.assertEqual(tut.sphinx._DEFAULT_PATH, None)
+        self.assertEqual(tut.sphinx.checkpoint._DEFAULT_PATH, None)
         sphinx_app.builder.build_all()
 
         # check the resolved paths in the cache
         self.assert_(
             os.path.join(
                 os.path.dirname(__file__), 'tut_directive', 'src'
-            ) in tut.sphinx._RESET_PATHS
+            ) in tut.sphinx.checkpoint._RESET_PATHS
         )
-        self.assertEqual(tut.sphinx._DEFAULT_PATH, '/src')
+        self.assertEqual(tut.sphinx.checkpoint._DEFAULT_PATH, '/src')
 
         # cleanup
         sphinx_app.cleanup()
@@ -64,7 +65,7 @@ class TutDirectiveTests(TestCase):
 
 
 @patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.git')
+@patch('tut.sphinx.checkpoint.git')
 class CheckpointDirectiveTests(TestCase):
 
     @with_sphinx()
@@ -97,7 +98,7 @@ class CheckpointDirectiveTests(TestCase):
         self.assert_(
             os.path.join(
                 os.path.dirname(__file__), 'relative_path', 'src'
-            ) in tut.sphinx._RESET_PATHS
+            ) in tut.sphinx.checkpoint._RESET_PATHS
         )
 
         # cleanup
@@ -114,12 +115,13 @@ class CheckpointDirectiveTests(TestCase):
         self.assert_(
             os.path.join(
                 os.path.dirname(__file__), 'abs_path', 'src'
-            ) in tut.sphinx._RESET_PATHS
+            ) in tut.sphinx.checkpoint._RESET_PATHS
         )
 
         # cleanup
         sphinx_app.cleanup()
         sphinx_app.builder.cleanup()
+
 
 @patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
 class CheckpointDirectiveWithLiveGitTests(TestCase):

@@ -100,12 +100,3 @@ def cleanup(app, exception):
             git.checkout(_RESET_PATHS[path])
     finally:
         os.chdir(curdir)
-
-
-def setup(app):
-
-    app.add_directive('tut', TutDefaults)
-    app.add_directive('checkpoint', TutCheckpoint)
-
-    app.connect('builder-inited', initialize)
-    app.connect('build-finished', cleanup)
