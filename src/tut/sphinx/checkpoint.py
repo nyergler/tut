@@ -7,9 +7,7 @@ from sh import git
 from docutils.parsers.rst import Directive, directives
 import sphinx.pycode
 
-
-_DEFAULT_PATH = None
-_RESET_PATHS = {}
+from .manager import TutManager
 
 
 class TutDefaults(Directive):
@@ -18,9 +16,9 @@ class TutDefaults(Directive):
     }
 
     def run(self):
+        manager = TutManager.get(self.state.document.settings.env)
 
-        global _DEFAULT_PATH
-        _DEFAULT_PATH = self.options['path']
+        manager.default_path = self.options['path']
 
         return []
 
@@ -36,14 +34,12 @@ class TutCheckpoint(Directive):
     }
 
     def run(self):
-
-        global _DEFAULT_PATH
-        global _RESET_PATHS
+        manager = TutManager.get(self.state.document.settings.env)
 
         if 'path' in self.options:
             tut_path = self.options['path']
-        elif _DEFAULT_PATH is not None:
-            tut_path = _DEFAULT_PATH
+        elif manager.default_path is not None:
+            tut_path = manager.default_path
         else:
             raise Exception("No tut path specified.")
 
@@ -55,9 +51,9 @@ class TutCheckpoint(Directive):
         os.chdir(tut_path)
 
         # if this is the first time visiting this repo
-        if tut_path not in _RESET_PATHS:
+        if tut_path not in manager.reset_paths:
             # record the current branch
-            _RESET_PATHS[tut_path] = \
+            manager.reset_paths[tut_path] = \
                 git('name-rev', 'HEAD').strip().split()[-1]
 
         git_ref = self.arguments[0].strip().lower()
@@ -85,18 +81,17 @@ class TutCheckpoint(Directive):
 
 def initialize(app):
 
-    global _RESET_PATHS
-    _RESET_PATHS = {}
+    TutManager.get(app.env).reset()
 
 
 def cleanup(app, exception):
 
-    global _RESET_PATHS
+    manager = TutManager.get(app.env)
 
     curdir = os.getcwd()
     try:
-        for path in _RESET_PATHS:
+        for path in manager.reset_paths:
             os.chdir(path)
-            git.checkout(_RESET_PATHS[path])
+            git.checkout(manager.reset_paths[path])
     finally:
         os.chdir(curdir)

@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from mock import patch
 
+from tut.sphinx.manager import TutManager
 import tut.sphinx.checkpoint
 
 from tut.tests import util
@@ -41,23 +42,22 @@ class SphinxExtensionLifecycleTests(TestCase):
 
 
 @patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.checkpoint.git')
+@patch('tut.sphinx.checkpoint.git', return_value='x')
 class TutDirectiveTests(TestCase):
 
     @with_sphinx(srcdir=util.test_root.parent/'tut_directive')
     def test_set_default_path(self, git_mock, sphinx_app=None):
         """tut directive sets the default repo path."""
 
-        self.assertEqual(tut.sphinx.checkpoint._DEFAULT_PATH, None)
         sphinx_app.builder.build_all()
 
         # check the resolved paths in the cache
         self.assert_(
             os.path.join(
                 os.path.dirname(__file__), 'tut_directive', 'src'
-            ) in tut.sphinx.checkpoint._RESET_PATHS
+            ) in TutManager.get(sphinx_app.env).reset_paths
         )
-        self.assertEqual(tut.sphinx.checkpoint._DEFAULT_PATH, '/src')
+        self.assertEqual(TutManager.get(sphinx_app.env).default_path, '/src')
 
         # cleanup
         sphinx_app.cleanup()
@@ -65,7 +65,7 @@ class TutDirectiveTests(TestCase):
 
 
 @patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.checkpoint.git')
+@patch('tut.sphinx.checkpoint.git', return_value='x')
 class CheckpointDirectiveTests(TestCase):
 
     @with_sphinx()
@@ -98,7 +98,7 @@ class CheckpointDirectiveTests(TestCase):
         self.assert_(
             os.path.join(
                 os.path.dirname(__file__), 'relative_path', 'src'
-            ) in tut.sphinx.checkpoint._RESET_PATHS
+            ) in TutManager.get(sphinx_app.env).reset_paths
         )
 
         # cleanup
@@ -115,7 +115,7 @@ class CheckpointDirectiveTests(TestCase):
         self.assert_(
             os.path.join(
                 os.path.dirname(__file__), 'abs_path', 'src'
-            ) in tut.sphinx.checkpoint._RESET_PATHS
+            ) in TutManager.get(sphinx_app.env).reset_paths
         )
 
         # cleanup
