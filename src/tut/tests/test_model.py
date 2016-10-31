@@ -41,6 +41,29 @@ class TutInitTests(TutTestCase):
             'points: []',
         )
 
+    def test_tut_can_reset_to_initial_rev(self):
+
+        # create a repository w/ another branch
+        t = tut.model.Tut(self._testpath)
+        t.init()
+        t.start('blarf')
+        t.checkout('master')
+
+        t = tut.model.Tut(self._testpath)
+        self.assertEqual(t._current_branch(), 'master')
+        t.edit('blarf')
+        self.assertEqual(t.current(), 'blarf')
+        t.reset()
+
+        self.assertEqual(t._current_branch(), 'master')
+
+    def test_reset_doesnt_fail_when_no_initial_rev(self):
+        t = tut.model.Tut(self._testpath)
+        t.init()
+        t.reset()
+
+        self.assertEqual(t._current_branch(), 'master')
+
 
 class TutPointsTests(TutTestCase):
     def test_points_returns_contents_of_pointfile(self):
@@ -134,7 +157,7 @@ class TutStartEditTests(TutTestCase):
 
         t.checkout('master')
 
-        # add new step between 2 and 3
+        # add new step at the end
         t.start('step4')
 
         self.assertEqual(

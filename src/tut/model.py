@@ -19,6 +19,13 @@ class Tut(object):
     def __init__(self, path):
         self.path = path
 
+        # record the current branch
+        self._initial_rev = None
+        try:
+            self._initial_rev = self._current_branch()
+        except Exception as e:
+            pass
+
     def _git(self, *args, **kwargs):
 
         return git(
@@ -168,3 +175,9 @@ class Tut(object):
 
         if merge:
             self._git('merge', current)
+
+    def reset(self):
+        """Reset the repo to the rev it was at when we started."""
+
+        if self._initial_rev is not None:
+            self.checkout(self._initial_rev)
