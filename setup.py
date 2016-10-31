@@ -39,7 +39,8 @@ setup(name='tut',
           ],
       },
       tests_require=[
-          'mock',
+        'mock',
+        'munch',
       ],
       test_suite='tut.tests',
 )

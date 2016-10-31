@@ -3,7 +3,6 @@ import os
 
 import six
 import sh
-from sh import git
 from docutils.parsers.rst import Directive, directives
 import sphinx.pycode
 
@@ -46,19 +45,10 @@ class TutCheckpoint(Directive):
         # paths are relative to the project root
         rel_path, tut_path = self.state.document.settings.env.relfn2path(
             tut_path)
-
-        curdir = os.getcwd()
-        os.chdir(tut_path)
-
-        # if this is the first time visiting this repo
-        if tut_path not in manager.reset_paths:
-            # record the current branch
-            manager.reset_paths[tut_path] = \
-                git('name-rev', 'HEAD').strip().split()[-1]
-
         git_ref = self.arguments[0].strip().lower()
+
         try:
-            git.checkout(git_ref)
+            manager.tut(tut_path).checkout(git_ref)
 
         except sh.ErrorReturnCode_1 as git_error:
             if six.b(
@@ -74,8 +64,6 @@ class TutCheckpoint(Directive):
         finally:
             sphinx.pycode.ModuleAnalyzer.cache = {}
 
-        os.chdir(curdir)
-
         return []
 
 
@@ -87,11 +75,4 @@ def initialize(app):
 def cleanup(app, exception):
 
     manager = TutManager.get(app.env)
-
-    curdir = os.getcwd()
-    try:
-        for path in manager.reset_paths:
-            os.chdir(path)
-            git.checkout(manager.reset_paths[path])
-    finally:
-        os.chdir(curdir)
+    manager.reset_tuts()

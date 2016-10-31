@@ -1,8 +1,11 @@
 import os
-from os import chdir as _chdir
 from unittest import TestCase
 
-from mock import patch
+from mock import (
+    ANY,
+    patch,
+)
+from munch import munchify
 
 from tut.sphinx.manager import TutManager
 import tut.sphinx.checkpoint
@@ -11,8 +14,7 @@ from tut.tests import util
 from tut.tests.util import with_sphinx
 
 
-@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.checkpoint.git', return_value='original_branch')
+@patch('tut.model.git', return_value='original_branch')
 class SphinxExtensionLifecycleTests(TestCase):
 
     # the order of these decorators is *important*: cleanup needs to
@@ -32,17 +34,16 @@ class SphinxExtensionLifecycleTests(TestCase):
 
         sphinx_app.build()
 
-        self.assertEqual(git_mock.checkout.call_count, 2)
-        self.assertEqual(git_mock.checkout.call_args_list[0][0],
-                         ('step_one',))
-        self.assertEqual(git_mock.checkout.call_args_list[1][0],
-                         ('original_branch',))
+        self.assertEqual(git_mock.call_count, 3)
+        self.assertEqual(git_mock.call_args_list[1][0],
+                         (ANY, ANY, 'checkout', 'step_one',))
+        self.assertEqual(git_mock.call_args_list[2][0],
+                         (ANY, ANY, 'checkout', 'original_branch',))
 
         self.assertEqual(start_dir, os.getcwd())
 
 
-@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.checkpoint.git', return_value='x')
+@patch('tut.model.git', return_value='x')
 class TutDirectiveTests(TestCase):
 
     @with_sphinx(srcdir=util.test_root.parent/'tut_directive')
@@ -64,17 +65,16 @@ class TutDirectiveTests(TestCase):
         sphinx_app.builder.cleanup()
 
 
-@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
-@patch('tut.sphinx.checkpoint.git', return_value='x')
+@patch('tut.model.git', return_value='x')
 class CheckpointDirectiveTests(TestCase):
 
     @with_sphinx()
     def test_checkpoint_triggers_checkout(self, git_mock, sphinx_app=None):
         sphinx_app.build()
 
-        self.assertEqual(git_mock.checkout.call_count, 2)
-        self.assertEqual(git_mock.checkout.call_args_list[0][0],
-                         ('step_one',))
+        self.assertEqual(git_mock.call_count, 3)
+        self.assertEqual(git_mock.call_args_list[1][0],
+                         (ANY, ANY, 'checkout', 'step_one',))
 
     @with_sphinx()
     def test_checkpoint_resets_pycode_cache(self, git_mock, sphinx_app=None):
@@ -123,21 +123,35 @@ class CheckpointDirectiveTests(TestCase):
         sphinx_app.builder.cleanup()
 
 
-@patch('os.chdir', new=lambda x: _chdir(x) if os.path.exists(x) else None)
 class CheckpointDirectiveWithLiveGitTests(TestCase):
 
-    @with_sphinx(srcdir=util.test_root.parent/'abs_path')
-    def test_invalid_checkpoint(self, sphinx_app=None):
+    def test_invalid_checkpoint(self):
         """Invalid checkpoint names return helpful error message."""
 
+        node = tut.sphinx.checkpoint.TutCheckpoint(
+            'checkpoint',
+            ('blarf',),
+            {'path': os.getcwd()},
+            content='',
+            lineno=0,
+            content_offset=0,
+            block_text=None,
+            state=munchify({
+                'document': {
+                    'settings': {
+                        'env': {
+                            'relfn2path': lambda p: (p, p)
+                        },
+                    },
+                },
+            }),
+            state_machine=None,
+        )
+
         with self.assertRaises(ValueError) as git_error:
-            sphinx_app.builder.build_all()
+            node.run()
 
         self.assertEqual(
             str(git_error.exception),
-            "git checkpoint 'step_one' does not exist.",
+            "git checkpoint 'blarf' does not exist.",
         )
-
-        # cleanup
-        sphinx_app.cleanup()
-        sphinx_app.builder.cleanup()

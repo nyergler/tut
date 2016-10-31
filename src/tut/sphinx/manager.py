@@ -1,3 +1,5 @@
+from tut.model import Tut
+
 
 class TutManager(object):
 
@@ -12,6 +14,8 @@ class TutManager(object):
         self.reset()
 
     def reset(self):
+        self.tuts = {}
+
         self.DEFAULT_PATH = None
         self.RESET_PATHS = {}
 
@@ -25,4 +29,19 @@ class TutManager(object):
 
     @property
     def reset_paths(self):
+        return {
+            t: path
+            for t, path in self.tuts.items()
+        }
         return self.RESET_PATHS
+
+    def tut(self, path):
+        """Return a Tut for the given path."""
+        if path not in self.tuts:
+            self.tuts[path] = Tut(path)
+
+        return self.tuts[path]
+
+    def reset_tuts(self):
+        for tut in self.tuts.values():
+            tut.reset()
