@@ -62,6 +62,9 @@ class TutContent(Directive):
     has_content = True
     required_arguments = 1
     optional_arguments = 0
+    option_spec = {
+        'path': directives.path,
+    }
 
     def run(self):
         manager = TutManager.get(self.state.document.settings.env)
