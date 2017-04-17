@@ -47,8 +47,7 @@ class Tut(object):
         return False
 
     def _config(self):
-        data = self._git('--no-pager', 'show', 'tut:tut.cfg')
-        return yaml.load(data.stdout)
+        return yaml.load(self.file('tut', 'tut.cfg'))
 
     def _update_config(self, config, log=None):
 
@@ -89,6 +88,9 @@ class Tut(object):
             log='Initializing Tut configuration.',
         )
         self._git('checkout', 'master')
+
+    def file(self, branch, path):
+        return self._git('--no-pager', 'show', f'{branch}:{path}').stdout
 
     def points(self, remote=None):
         """Return a list of existing checkpoints (branches).

@@ -189,3 +189,17 @@ class TutNextTests(TutTestCase):
         t.next()
         self.assertEqual(t._current_branch(), 'step2')
         self.assertEqual(t.current(), 'step2')
+
+
+class TutFileTests(TutTestCase):
+
+    def test_file_retrieves_content_from_branch(self):
+
+        t = tut.model.Tut(self._testpath)
+        t.init()
+
+        os.chdir(self._testpath)
+        self.assertEqual(
+            t.file('tut', 'tut.cfg').strip(),
+            b'points: []',
+        )
