@@ -60,6 +60,7 @@ def setup(app):
     app.add_directive('tut:exec', TutExec)
     app.add_directive('tut:content', TutContent)
     app.add_directive('checkpoint', TutCheckpoint)
+    app.add_directive('tut:checkpoint', TutCheckpoint)
 
     app.connect('builder-inited', initialize)
     app.connect('build-finished', cleanup)
@@ -67,4 +68,5 @@ def setup(app):
 
     return {
         'version': version(),
+        'parallel_read_safe': False,
     }
