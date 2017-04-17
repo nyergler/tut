@@ -3,6 +3,7 @@
 Usage:
   tut init [<path>]
   tut start <name>
+  tut fetch <remote>
   tut points
   tut edit <name>
   tut next [--merge]
@@ -58,7 +59,7 @@ def start(tut, args):
 def points(tut, args):
 
     for point in tut.points():
-        print point
+        print(point)
 
 
 def edit(tut, args):
@@ -93,8 +94,8 @@ def main():
                     Tut(os.getcwd()),
                     arguments,
                 )
-            except TutException, e:
-                print "Error: %s" % e
+            except TutException as e:
+                print("Error: %s" % e)
                 sys.exit(1)
 
             break
