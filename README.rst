@@ -95,6 +95,9 @@ To start using Tut, run ``tut init <path>``::
 If the path (``./demosrc``) is not an existing git repository, Tut
 will initialize one and add an initial commit.
 
+Subsequent Tut commands should be run from within the Tut-managed
+repository.
+
 When you want to start a new step (checkpoint) starting from the one
 you're currently on, run ``tut start``::
 
