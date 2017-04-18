@@ -2,124 +2,15 @@ import difflib
 
 import re
 
-from six import BytesIO, StringIO
-
-from sphinx.errors import PycodeError
-from sphinx.pycode.pgen2 import token, tokenize, parse
-from sphinx.util import get_module_source, detect_encoding
-from sphinx.util.pycompat import TextIOWrapper
+from sphinx.pycode import ModuleAnalyzer as SphinxModuleAnalyzer
+from sphinx.pycode.pgen2 import token
 
 
 emptyline_re = re.compile(r'^\s*(#.*)?$')
 
 
-# ModuleAnalyzer borrowed from Sphinx core to add top-level constant support
-class ModuleAnalyzer(object):
-    # cache for analyzer objects -- caches both by module and file name
-    cache = {}  # type: Dict[Tuple[unicode, unicode], Any]
-
-    @classmethod
-    def for_string(cls, string, modname, srcname='<string>'):
-        if isinstance(string, bytes):
-            return cls(BytesIO(string), modname, srcname)
-        return cls(StringIO(string), modname, srcname, decoded=True)
-
-    @classmethod
-    def for_file(cls, filename, modname):
-        if ('file', filename) in cls.cache:
-            return cls.cache['file', filename]
-        try:
-            fileobj = open(filename, 'rb')
-        except Exception as err:
-            raise PycodeError('error opening %r' % filename, err)
-        obj = cls(fileobj, modname, filename)
-        cls.cache['file', filename] = obj
-        return obj
-
-    @classmethod
-    def for_module(cls, modname):
-        if ('module', modname) in cls.cache:
-            entry = cls.cache['module', modname]
-            if isinstance(entry, PycodeError):
-                raise entry
-            return entry
-
-        try:
-            type, source = get_module_source(modname)
-            if type == 'string':
-                obj = cls.for_string(source, modname)
-            else:
-                obj = cls.for_file(source, modname)
-        except PycodeError as err:
-            cls.cache['module', modname] = err
-            raise
-        cls.cache['module', modname] = obj
-        return obj
-
-    def __init__(self, source, modname, srcname, decoded=False):
-        # name of the module
-        self.modname = modname
-        # name of the source file
-        self.srcname = srcname
-        # file-like object yielding source lines
-        self.source = source
-
-        # cache the source code as well
-        pos = self.source.tell()
-        if not decoded:
-            self.encoding = detect_encoding(self.source.readline)
-            self.source.seek(pos)
-            self.code = self.source.read().decode(self.encoding)
-            self.source.seek(pos)
-            self.source = TextIOWrapper(self.source, self.encoding)
-        else:
-            self.encoding = None
-            self.code = self.source.read()
-            self.source.seek(pos)
-
-        # will be filled by tokenize()
-        self.tokens = None      # type: List[unicode]
-        # will be filled by parse()
-        self.parsetree = None   # type: Any
-        # will be filled by find_attr_docs()
-        self.attr_docs = None   # type: List[unicode]
-        self.tagorder = None    # type: Dict[unicode, int]
-        # will be filled by find_tags()
-        self.tags = None        # type: List[unicode]
-
-    def tokenize(self):
-        """Generate tokens from the source."""
-        if self.tokens is not None:
-            return
-        try:
-            self.tokens = list(tokenize.generate_tokens(self.source.readline))
-        except tokenize.TokenError as err:
-            raise PycodeError('tokenizing failed', err)
-        self.source.close()
-
-    def parse(self):
-        """Parse the generated source tokens."""
-        if self.parsetree is not None:
-            return
-        self.tokenize()
-        try:
-            self.parsetree = pydriver.parse_tokens(self.tokens)
-        except parse.ParseError as err:
-            raise PycodeError('parsing failed', err)
-
-    def find_attr_docs(self, scope=''):
-        """Find class and module-level attributes and their documentation."""
-        if self.attr_docs is not None:
-            return self.attr_docs
-        self.parse()
-        attr_visitor = AttrDocVisitor(number2name, scope, self.encoding)
-        attr_visitor.visit(self.parsetree)
-        self.attr_docs = attr_visitor.collected
-        self.tagorder = attr_visitor.tagorder
-        # now that we found everything we could in the tree, throw it away
-        # (it takes quite a bit of memory for large modules)
-        self.parsetree = None
-        return attr_visitor.collected
+# Extend Sphinx's Module Analyzer to support top-leve constants
+class ModuleAnalyzer(SphinxModuleAnalyzer):
 
     def find_tags(self):
         """Find class, function and method definitions and their location."""
