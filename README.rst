@@ -5,8 +5,8 @@
 .. image:: https://travis-ci.org/nyergler/tut.png
    :target: https://travis-ci.org/nyergler/tut
 
-.. image:: https://coveralls.io/repos/nyergler/tut/badge.svg?branch=master
-  :target: https://coveralls.io/r/nyergler/tut?branch=master
+.. image:: https://coveralls.io/repos/github/nyergler/tut/badge.svg?branch=master
+   :target: https://coveralls.io/github/nyergler/tut?branch=master
 
 
 **Tut** is a tool that helps you write tutorial style documentation

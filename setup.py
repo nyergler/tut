@@ -41,6 +41,7 @@ setup(name='tut',
       tests_require=[
         'mock',
         'munch',
+        'sphinx-testing',
       ],
       test_suite='tut.tests',
 )
