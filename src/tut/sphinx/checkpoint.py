@@ -49,6 +49,7 @@ class TutCheckpoint(Directive):
 
         try:
             manager.tut(tut_path).checkout(git_ref)
+            self.state.document.git_ref = git_ref
 
         except sh.ErrorReturnCode_1 as git_error:
             if six.b(

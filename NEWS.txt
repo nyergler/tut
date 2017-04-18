@@ -7,6 +7,7 @@ Development
 
 *Release date: UNRELEASED*
 
+* Addition of ``tut:literalinclude`` and ``tut:diff`` directives
 * Sphinx directives are namespaced under ``tut:``
 * Drop support for Sphinx releases prior to 1.5
 * Drop support for Python 2
