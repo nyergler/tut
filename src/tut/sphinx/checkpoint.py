@@ -12,12 +12,12 @@ from .manager import TutManager
 class TutDefaults(Directive):
     option_spec = {
         'path': directives.path,
+        'href': directives.unchanged,
     }
 
     def run(self):
         manager = TutManager.get(self.state.document.settings.env)
-
-        manager.default_path = self.options['path']
+        manager.update_defaults(self.options)
 
         return []
 

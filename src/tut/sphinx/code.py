@@ -1,15 +1,10 @@
-import codecs
-import logging
-
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
+from docutils.statemachine import ViewList
 from sphinx.directives.code import (
-    container_wrapper,
     dedent_lines,
     LiteralInclude,
 )
-from sphinx.util import parselinenos
-from sphinx.util.nodes import set_source_info
 
 from tut import diff
 from .manager import TutManager
@@ -21,14 +16,9 @@ class TutLiteralInclude(LiteralInclude):
         # get the current Tut
         manager = TutManager.get(self.state.document.settings.env)
 
-        if 'path' in self.options:
-            tut_path = self.options['path']
-        elif manager.default_path is not None:
-            tut_path = manager.default_path
-        else:
-            raise Exception("No tut path specified.")
         rel_path, tut_path = self.state.document.settings.env.relfn2path(
-            tut_path)
+            manager.resolve_option(self, 'path'),
+        )
 
         rel_fn, _ = self.state.document.settings.env.relfn2path(self.arguments[0])
 
@@ -65,6 +55,9 @@ class TutCodeDiff(Directive):
     def run(self):
         manager = TutManager.get(self.state.document.settings.env)
 
+        tut_path = manager.resolve_option(self, 'path')
+        tut_href = manager.resolve_option(self, 'href', None)
+
         if 'path' in self.options:
             tut_path = self.options['path']
         elif manager.default_path is not None:
@@ -94,6 +87,28 @@ class TutCodeDiff(Directive):
 
         code = diff.diff_contents(old, new, name=rel_obj_name)
         literal = nodes.literal_block(code, code)
-        ## literal['language'] = self.arguments[0]
+        literal['language'] = 'python'
+
+        if tut_href:
+            link = tut_href.format(checkpoint=ref, path=rel_obj_name)
+            caption = 'View file `{0} <{1}>`_'.format(rel_obj_name, link)
+            literal = container_wrapper(self, literal, caption)
 
         return [literal]
+
+
+def container_wrapper(directive, literal_node, caption):
+    container_node = nodes.container('', literal_block=True,
+                                     classes=['literal-diff-wrapper'])
+    parsed = nodes.Element()
+    directive.state.nested_parse(ViewList([caption], source=''),
+                                 directive.content_offset, parsed)
+    if isinstance(parsed[0], nodes.system_message):
+        raise ValueError(parsed[0])
+    caption_node = nodes.caption(parsed[0].rawsource, '',
+                                 *parsed[0].children)
+    caption_node.source = literal_node.source
+    caption_node.line = literal_node.line
+    container_node += caption_node
+    container_node += literal_node
+    return container_node

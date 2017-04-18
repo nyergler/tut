@@ -1,6 +1,11 @@
 from tut.model import Tut
 
 
+class UNSET(object):
+    pass
+UNSET = UNSET()
+
+
 class TutManager(object):
 
     @classmethod
@@ -15,17 +20,18 @@ class TutManager(object):
 
     def reset(self):
         self.tuts = {}
+        self._options = {}
 
         self.DEFAULT_PATH = None
         self.RESET_PATHS = {}
 
     @property
     def default_path(self):
-        return self.DEFAULT_PATH
+        return self._options.get('path')
 
     @default_path.setter
     def default_path(self, path):
-        self.DEFAULT_PATH = path
+        self._options['path'] = path
 
     @property
     def reset_paths(self):
@@ -45,3 +51,20 @@ class TutManager(object):
     def reset_tuts(self):
         for tut in self.tuts.values():
             tut.reset()
+
+    def update_defaults(self, options):
+
+        self._options = options.copy()
+
+    def resolve_option(self, node, key, default=UNSET):
+
+        if key in node.options:
+            return node.options[key]
+
+        if key in self._options:
+            return self._options[key]
+
+        if default is not UNSET:
+            return default
+
+        raise Exception("No tut {0} specified.".format(key))
