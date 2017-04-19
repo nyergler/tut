@@ -91,7 +91,7 @@ class TutCodeDiff(Directive):
 
         if tut_href:
             link = tut_href.format(checkpoint=ref, path=rel_obj_name)
-            caption = 'View file `{0} <{1}>`_'.format(rel_obj_name, link)
+            caption = 'View file `{0} <{2}>`__'.format(rel_obj_name, ref, link)
             literal = container_wrapper(self, literal, caption)
 
         return [literal]
