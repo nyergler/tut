@@ -98,12 +98,12 @@ def _find_object(codetext, pos_range, name):
     lineno = pos_range[0]
 
     code = ModuleAnalyzer.for_string(''.join(codetext), name)
-    code.find_tags()
+    tags = code.find_tags()
 
     # order the tags by starting position and covert to 0 based indices
     ordered_tags = sorted(
         [[item_type, name, start - 1, end - 1]
-         for (name, (item_type, start, end)) in code.tags.items()],
+         for (name, (item_type, start, end)) in tags.items()],
         key=lambda t: t[2],
     )
 
@@ -112,7 +112,7 @@ def _find_object(codetext, pos_range, name):
 
     # determine the "display end" of each tag
     for i in range(len(ordered_tags) - 1):
-        ordered_tags[i].append(ordered_tags[i+1][2] - 1)
+        ordered_tags[i].append(ordered_tags[i+1][2])
     ordered_tags[-1].append(ordered_tags[-1][-1])
 
     # find all overlapping segments
@@ -127,14 +127,32 @@ def _find_object(codetext, pos_range, name):
         yield start, end
 
 
+def _strip_lines(lines):
+
+    if not lines:
+        return lines
+
+    start = 0
+    end = len(lines)
+
+    while not(lines[start].strip()) and start < end:
+        start += 1
+
+    while not(lines[end-1].strip()) and end > start:
+        end -= 1
+
+    return lines[start:end]
+
+
 def diff_contents(previously, now, name=''):
     """Given two versions of code and return the diff needed for documentation."""
 
     previously = previously.splitlines(keepends=True)
     now = now.splitlines(keepends=True)
 
-    last = -1
     result = []
+    ranges = []
+
     for group in difflib.SequenceMatcher(None, previously, now).get_grouped_opcodes(n=0):
         for tag, i1, i2, j1, j2 in group:
             if tag == 'equal':
@@ -142,9 +160,6 @@ def diff_contents(previously, now, name=''):
                 continue
 
             if tag in ('insert', 'replace'):
-                if last > 0 and j1 > last:
-                    result.extend(['\n', '...\n', '\n'])
-
                 # determine if this is an indented block or not
                 fl_no, first_line = next(
                     (i, line) for (i, line) in enumerate(now[j1:j2], j1)
@@ -153,18 +168,29 @@ def diff_contents(previously, now, name=''):
 
                 if first_line[0] != ' ':
                     # this block is unindented, just append it to the result
-                    result.extend(now[j1:j2])
+                    ranges.append((j1, j2))
                 else:
                     # grab the object from the code analyzer
-                    first = True
                     for start, end in _find_object(now, (fl_no, j2), name=name):
-                        if not first:
-                            result.extend(['\n', '...\n', '\n'])
+                        ranges.append((start, end))
 
-                        result.extend(now[start:end])
-                        first = False
+    # fix up overlapping ranges
+    for i in range(len(ranges) - 1):
+        # if this range starts before a previous one, fix that
+        if i > 0 and ranges[i][0] < ranges[i-1][1]:
+            ranges[i] = (ranges[i-1][1], ranges[i][1])
 
-                last = j2
-                continue
+    # fetch the lines and add ellipsis
+    ellipsis = ['\n', '...\n', '\n']
+    if not ranges:
+        return ''
+
+    prev_end = ranges[0][0]
+    for start, end in ranges:
+        if start > prev_end:
+            result.extend(ellipsis)
+
+        result.extend(_strip_lines(now[start:end]))
+        prev_end = end
 
     return ''.join(result)

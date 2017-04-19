@@ -124,6 +124,10 @@ class DiffTests(unittest.TestCase):
             diff.diff_contents(TEST_CLASS, TEST_CLASS_2, name='adder.py'),
             textwrap.dedent("""\
             class Adder(object):
+                \"""Doc string
+                \"""
+
+                foo = 42
 
             ...
 
@@ -137,6 +141,10 @@ class DiffTests(unittest.TestCase):
             diff.diff_contents(TEST_CLASS_3, TEST_CLASS_2, name='adder.py'),
             textwrap.dedent("""\
             class Adder(object):
+                \"""Doc string
+                \"""
+
+                foo = 42
 
             ...
 
@@ -158,10 +166,26 @@ class DiffTests(unittest.TestCase):
             """),
         )
 
+    def test_multi_line_import_diff(self):
+        self.assertEqual(
+            diff.diff_contents(IMPORT_1, IMPORT_2),
+            IMPORT_2,
+        )
+
+    def test_hightlight_changed_lines_in_context(self):
+        pass
+
+    def test_strips_blank_lines_post_ellipsis(self):
+        pass
+
 
 TEST_CLASS = """
 
 class Adder(object):
+    \"""Doc string
+    \"""
+
+    foo = 42
 
     def __init__(self, *args):
         self._args = args
@@ -170,6 +194,10 @@ class Adder(object):
 TEST_CLASS_2 = """
 
 class Adder(object):
+    \"""Doc string
+    \"""
+
+    foo = 42
 
     def __init__(self, *args):
         self._args = args
@@ -182,6 +210,8 @@ class Adder(object):
 TEST_CLASS_3 = """
 
 class Adder(object):
+    \"""Doc string
+    \"""
 
     def __init__(self, *args):
         self._args = args
@@ -217,4 +247,18 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'addresses.sqlite3'),
     }
 }
+"""
+
+IMPORT_1 = """\
+from uuid import (
+    uuid4,
+)
+"""
+
+IMPORT_2 = """\
+from uuid import (
+    uuid4,
+    UUID,
+)
+import sys
 """
