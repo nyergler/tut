@@ -34,17 +34,10 @@ class TutCheckpoint(Directive):
 
     def run(self):
         manager = TutManager.get(self.state.document.settings.env)
-
-        if 'path' in self.options:
-            tut_path = self.options['path']
-        elif manager.default_path is not None:
-            tut_path = manager.default_path
-        else:
-            raise Exception("No tut path specified.")
+        path = manager.resolve_option(self, 'path')
 
         # paths are relative to the project root
-        rel_path, tut_path = self.state.document.settings.env.relfn2path(
-            tut_path)
+        rel_path, tut_path = self.state.document.settings.env.relfn2path(path)
         git_ref = self.arguments[0].strip().lower()
 
         try:

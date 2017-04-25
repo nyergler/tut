@@ -26,20 +26,11 @@ class TutManager(object):
         self.RESET_PATHS = {}
 
     @property
-    def default_path(self):
-        return self._options.get('path')
-
-    @default_path.setter
-    def default_path(self, path):
-        self._options['path'] = path
-
-    @property
     def reset_paths(self):
         return {
             t: path
             for t, path in self.tuts.items()
         }
-        return self.RESET_PATHS
 
     def tut(self, path):
         """Return a Tut for the given path."""
@@ -68,3 +59,9 @@ class TutManager(object):
             return default
 
         raise Exception("No tut {0} specified.".format(key))
+
+    def __getattr__(self, key):
+        if key.startswith('default_') and key.split('_', 1)[-1] in self._options:
+            return self._options[key.split('_', 1)[-1]]
+
+        return super(TutManager, self).__getattr__(key)

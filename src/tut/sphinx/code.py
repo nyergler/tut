@@ -58,13 +58,6 @@ class TutCodeDiff(Directive):
         tut_path = manager.resolve_option(self, 'path')
         tut_href = manager.resolve_option(self, 'href', None)
 
-        if 'path' in self.options:
-            tut_path = self.options['path']
-        elif manager.default_path is not None:
-            tut_path = manager.default_path
-        else:
-            raise Exception("No tut path specified.")
-
         # paths are relative to the project root
         rel_path, tut_path = self.state.document.settings.env.relfn2path(
             tut_path)
