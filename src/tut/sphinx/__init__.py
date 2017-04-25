@@ -7,10 +7,10 @@ from tut.sphinx.checkpoint import (
     initialize,
     cleanup,
 )
-from tut.sphinx.content import (
-    TutContent,
-    TutExec,
-)
+# from tut.sphinx.content import (
+#     TutContent,
+#     TutExec,
+# )
 from tut.sphinx.code import (
     TutCodeDiff,
     TutLiteralInclude,
@@ -20,8 +20,8 @@ from tut.sphinx.code import (
 def setup(app):
 
     app.add_directive('tut', TutDefaults)
-    app.add_directive('tut:exec', TutExec)
-    app.add_directive('tut:content', TutContent)
+    # app.add_directive('tut:exec', TutExec)
+    # app.add_directive('tut:content', TutContent)
     app.add_directive('checkpoint', TutCheckpoint)
     app.add_directive('tut:checkpoint', TutCheckpoint)
     app.add_directive('tut:literalinclude', TutLiteralInclude)
