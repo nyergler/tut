@@ -9,6 +9,7 @@ env:
 install:
   - pip install coveralls
   - pip install --allow-external Sphinx --allow-unverified Sphinx $SPHINX_SPEC
+  - pip install git+https://github.com/nyergler/sphinx-testing.git
   - python setup.py install
 
 before_script:
