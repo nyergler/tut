@@ -30,7 +30,7 @@ class TutLiteralInclude(LiteralInclude):
 
             lines = text.splitlines(True)
             if 'dedent' in self.options:
-                return dedent_lines(lines, self.options.get('dedent'), location=location)
+                return dedent_lines(lines, self.options.get('dedent'))
             else:
                 return lines
         except (IOError, OSError):

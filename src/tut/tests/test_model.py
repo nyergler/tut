@@ -2,8 +2,8 @@ import os
 import shutil
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from mock import patch
 from sh import git
 
 import tut.model

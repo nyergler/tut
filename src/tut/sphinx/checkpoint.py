@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 import os
 
-import six
 import sh
 from docutils.parsers.rst import Directive, directives
 import sphinx.pycode
@@ -45,12 +44,7 @@ class TutCheckpoint(Directive):
             self.state.document.git_ref = git_ref
 
         except sh.ErrorReturnCode_1 as git_error:
-            if six.b(
-                "error: pathspec '%s' did not match any "
-                "file(s) known to git.\n" % (
-                    git_ref,
-                )
-            ) == git_error.stderr:
+            if ("error: pathspec '%s' did not match any file(s) known to git.\n" % (git_ref,)).encode() == git_error.stderr:
                 raise ValueError(
                     "git checkpoint '%s' does not exist." % (git_ref,)
                 )

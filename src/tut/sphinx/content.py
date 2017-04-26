@@ -2,7 +2,6 @@ from __future__ import absolute_import
 import os
 import subprocess
 
-import six
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 import sphinx.pycode

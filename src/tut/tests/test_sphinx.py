@@ -1,10 +1,10 @@
 import os
 from unittest import TestCase
-
-from mock import (
+from unittest.mock import (
     ANY,
     patch,
 )
+
 from munch import munchify
 from sphinx_testing import with_app
 from sphinx_testing.path import path
@@ -62,10 +62,6 @@ class TutDirectiveTests(TestCase):
         )
         self.assertEqual(TutManager.get(sphinx_app.env).default_path, '/src')
 
-        # cleanup
-        sphinx_app.cleanup()
-        sphinx_app.builder.cleanup()
-
 
 @patch('tut.model.git', return_value='x')
 class CheckpointDirectiveTests(TestCase):
@@ -103,10 +99,6 @@ class CheckpointDirectiveTests(TestCase):
             ) in TutManager.get(sphinx_app.env).reset_paths
         )
 
-        # cleanup
-        sphinx_app.cleanup()
-        sphinx_app.builder.cleanup()
-
     @with_app(srcdir=test_root.parent/'abs_path')
     def test_absolute_paths(self, git_mock, sphinx_app, status, warning):
         """Absolute paths are relative to the project root."""
@@ -119,10 +111,6 @@ class CheckpointDirectiveTests(TestCase):
                 os.path.dirname(__file__), 'abs_path', 'src'
             ) in TutManager.get(sphinx_app.env).reset_paths
         )
-
-        # cleanup
-        sphinx_app.cleanup()
-        sphinx_app.builder.cleanup()
 
 
 class CheckpointDirectiveWithLiveGitTests(TestCase):

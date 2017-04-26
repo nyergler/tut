@@ -6,14 +6,13 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.3'
+version = '0.5'
 
 install_requires = [
     'docopt',
     'pyyaml',
     'sh',
     'Sphinx',
-    'six',
 ]
 
 
@@ -39,7 +38,6 @@ setup(name='tut',
           ],
       },
       tests_require=[
-        'mock',
         'munch',
         'sphinx-testing',
       ],
