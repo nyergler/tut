@@ -55,7 +55,7 @@ class TutDirectiveTests(TestCase):
         sphinx_app.builder.build_all()
 
         # check the resolved paths in the cache
-        self.assert_(
+        self.assertTrue(
             os.path.join(
                 os.path.dirname(__file__), 'tut_directive', 'src'
             ) in TutManager.get(sphinx_app.env).reset_paths
@@ -97,7 +97,7 @@ class CheckpointDirectiveTests(TestCase):
         sphinx_app.builder.build_all()
 
         # check the resolved paths in the cache
-        self.assert_(
+        self.assertTrue(
             os.path.join(
                 os.path.dirname(__file__), 'relative_path', 'src'
             ) in TutManager.get(sphinx_app.env).reset_paths
@@ -114,7 +114,7 @@ class CheckpointDirectiveTests(TestCase):
         sphinx_app.builder.build_all()
 
         # check the resolved paths in the cache
-        self.assert_(
+        self.assertTrue(
             os.path.join(
                 os.path.dirname(__file__), 'abs_path', 'src'
             ) in TutManager.get(sphinx_app.env).reset_paths
