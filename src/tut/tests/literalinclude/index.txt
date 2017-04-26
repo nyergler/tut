@@ -1,0 +1,11 @@
+==================
+Tut Directive Test
+==================
+
+.. tut:checkpoint:: step_one
+   :path: /testing
+
+Test Document
+
+.. tut:literalinclude:: /testing/setup.py
+
