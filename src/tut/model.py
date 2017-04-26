@@ -55,11 +55,12 @@ class Tut(object):
 
         try:
             self._git('checkout', 'tut')
-            yaml.dump(
-                config,
-                open(os.path.join(self.path, 'tut.cfg'), 'w'),
-                default_flow_style=False,
-            )
+            with open(os.path.join(self.path, 'tut.cfg'), 'w') as tut_cfg:
+                yaml.dump(
+                    config,
+                    tut_cfg,
+                    default_flow_style=False,
+                )
             self._git('add', 'tut.cfg')
             self._git('commit',
                 m=log or 'Update configuration.',
