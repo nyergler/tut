@@ -4,33 +4,33 @@ from docutils.statemachine import ViewList
 from sphinx.directives.code import (
     dedent_lines,
     LiteralInclude,
+    LiteralIncludeReader as SphinxLiteralIncludeReader,
 )
 
 from tut import diff
 from .manager import TutManager
 
 
-class TutLiteralInclude(LiteralInclude):
+class LiteralIncludeReader(SphinxLiteralIncludeReader):
 
-    def read_with_encoding(self, filename, document, codec_info, encoding):
-        # get the current Tut
-        manager = TutManager.get(self.state.document.settings.env)
+    def __init__(self, filename, options, config, tut, gitref):
+        self._tut = tut
+        self._gitref = gitref
 
-        rel_path, tut_path = self.state.document.settings.env.relfn2path(
-            manager.resolve_option(self, 'path'),
-        )
+        super().__init__(filename, options, config)
 
-        rel_fn, _ = self.state.document.settings.env.relfn2path(self.arguments[0])
+    def read_file(self, filename, location=None):
+        # type: (unicode, Any) -> List[unicode]
 
-        tut = manager.tut(tut_path)
         try:
-            text = tut.file(self.state.document.git_ref, rel_fn[len(rel_path) + 1:]).decode('utf-8')
+            text = self._tut.file(self._gitref, self.filename[len(self._tut.path) + 1:]).decode(self.encoding)
+
             if 'tab-width' in self.options:
                 text = text.expandtabs(self.options['tab-width'])
 
             lines = text.splitlines(True)
             if 'dedent' in self.options:
-                return dedent_lines(lines, self.options.get('dedent'))
+                return dedent_lines(lines, self.options.get('dedent'), location=location)
             else:
                 return lines
         except (IOError, OSError):
@@ -39,6 +39,71 @@ class TutLiteralInclude(LiteralInclude):
             raise UnicodeError(_('Encoding %r used for reading included file %r seems to '
                                  'be wrong, try giving an :encoding: option') %
                                (self.encoding, filename))
+
+class TutLiteralInclude(LiteralInclude):
+
+    def run(self):
+        # type: () -> List[nodes.Node]
+        document = self.state.document
+        if not document.settings.file_insertion_enabled:
+            return [document.reporter.warning('File insertion disabled',
+                                              line=self.lineno)]
+        env = document.settings.env
+
+        # get the current Tut
+        manager = TutManager.get(env)
+        rel_path, tut_path = self.state.document.settings.env.relfn2path(
+            manager.resolve_option(self, 'path'),
+        )
+
+        # convert options['diff'] to absolute path
+        if 'diff' in self.options:
+            _, path = env.relfn2path(self.options['diff'])
+            self.options['diff'] = path
+
+        try:
+            location = self.state_machine.get_source_and_line(self.lineno)
+            rel_filename, filename = env.relfn2path(self.arguments[0])
+            env.note_dependency(rel_filename)
+
+            reader = LiteralIncludeReader(
+                filename, self.options, env.config,
+                tut=manager.tut(tut_path),
+                gitref=self.state.document.git_ref,
+            )
+            text, lines = reader.read(location=location)
+
+            retnode = nodes.literal_block(text, text, source=filename)
+            set_source_info(self, retnode)
+            if self.options.get('diff'):  # if diff is set, set udiff
+                retnode['language'] = 'udiff'
+            elif 'language' in self.options:
+                retnode['language'] = self.options['language']
+            retnode['linenos'] = ('linenos' in self.options or
+                                  'lineno-start' in self.options or
+                                  'lineno-match' in self.options)
+            retnode['classes'] += self.options.get('class', [])
+            extra_args = retnode['highlight_args'] = {}
+            if 'emphasize-lines' in self.options:
+                hl_lines = parselinenos(self.options['emphasize-lines'], lines)
+                if any(i >= lines for i in hl_lines):
+                    logger.warning('line number spec is out of range(1-%d): %r' %
+                                   (lines, self.options['emphasize_lines']),
+                                   location=location)
+                extra_args['hl_lines'] = [x + 1 for x in hl_lines if x < lines]
+            extra_args['linenostart'] = reader.lineno_start
+
+            if 'caption' in self.options:
+                caption = self.options['caption'] or self.arguments[0]
+                retnode = container_wrapper(self, retnode, caption)
+
+            # retnode will be note_implicit_target that is linked from caption and numref.
+            # when options['name'] is provided, it should be primary ID.
+            self.add_name(retnode)
+
+            return [retnode]
+        except Exception as exc:
+            return [document.reporter.warning(str(exc), line=self.lineno)]
 
 
 class TutCodeDiff(Directive):

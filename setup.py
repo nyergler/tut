@@ -13,6 +13,7 @@ install_requires = [
     'pyyaml',
     'sh',
     'Sphinx',
+    'sphinxcontrib-websupport',
 ]
 
 
@@ -38,8 +39,8 @@ setup(name='tut',
           ],
       },
       tests_require=[
-        'munch',
-        'sphinx-testing',
+          'munch',
+          'sphinx-testing',
       ],
       test_suite='tut.tests',
 )

@@ -21,6 +21,7 @@ class TutLiteralIncludeTests(TestCase):
         })
         git_mock().tut().configure_mock(**{
             'file.return_value': b'foobar',
+            'path': test_root/'literalinclude'/'testing',
         })
         sphinx_app.builder.build_all()
 
