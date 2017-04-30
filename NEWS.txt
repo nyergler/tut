@@ -4,6 +4,16 @@ News
 
 DEVELOPMENT
 
+(unreleased)
+
+...
+
+
+0.5.1
+--------
+
+*Release Date: 30 April 2017*
+
 * Fixed missing import which caused tut:literalinclude to silently fails
 
 0.5.0
