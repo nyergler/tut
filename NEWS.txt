@@ -2,10 +2,18 @@
 News
 ====
 
+DEVELOPMENT
+-----------
+
+*Unreleased*
+
+...
+
+
 0.5
 ---
 
-* Release Date: 30 April 2017*
+*Release Date: 30 April 2017*
 
 * Addition of ``tut:literalinclude`` and ``tut:diff`` directives
 * Sphinx directives are namespaced under ``tut:``
