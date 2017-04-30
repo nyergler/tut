@@ -5,10 +5,7 @@ News
 DEVELOPMENT
 -----------
 
-*Unreleased*
-
-...
-
+* Fixed missing import which caused tut:literalinclude to silently fails
 
 0.5
 ---

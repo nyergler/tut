@@ -6,6 +6,7 @@ from sphinx.directives.code import (
     LiteralInclude,
     LiteralIncludeReader as SphinxLiteralIncludeReader,
 )
+from sphinx.util.nodes import set_source_info
 
 from tut import diff
 from .manager import TutManager

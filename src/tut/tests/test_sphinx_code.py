@@ -1,3 +1,4 @@
+import os.path
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -30,3 +31,7 @@ class TutLiteralIncludeTests(TestCase):
             git_mock().tut().file.call_args[0],
             ('step_one', 'setup.py'),
         )
+
+        # ensure the content was correctly included
+        with open(os.path.join(sphinx_app.builddir, 'html', 'index.html')) as output_html:
+            self.assertIn('foobar', output_html.read())
