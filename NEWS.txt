@@ -2,14 +2,14 @@
 News
 ====
 
-Development
------------
+0.5
+---
 
-*Release date: UNRELEASED*
+* Release Date: 30 April 2017*
 
 * Addition of ``tut:literalinclude`` and ``tut:diff`` directives
 * Sphinx directives are namespaced under ``tut:``
-* Drop support for Sphinx releases prior to 1.5
+* Drop support for Sphinx releases prior to 1.6
 * Drop support for Python 2
 * Use dedicated config file on special branch for maintaining point
   list.
