@@ -4,11 +4,12 @@ python:
   - "3.6"
 
 env:
+  - SPHINX_SPEC=Sphinx~=1.6.0
   - SPHINX_SPEC=git+https://github.com/sphinx-doc/sphinx.git#egg=Sphinx-dev
 
 install:
   - pip install coveralls
-  - pip install Sphinx $SPHINX_SPEC
+  - pip install $SPHINX_SPEC
   - pip install git+https://github.com/nyergler/sphinx-testing.git
   - python setup.py install
 

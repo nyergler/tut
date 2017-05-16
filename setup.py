@@ -12,8 +12,7 @@ install_requires = [
     'docopt',
     'pyyaml',
     'sh',
-    'Sphinx',
-    'sphinxcontrib-websupport',
+    'Sphinx>=1.6.0',
 ]
 
 
@@ -40,7 +39,7 @@ setup(name='tut',
       },
       tests_require=[
           'munch',
-          'sphinx-testing',
+          'sphinx-testing>=0.7.2',
       ],
       test_suite='tut.tests',
 )
