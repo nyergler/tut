@@ -142,6 +142,20 @@ not contain uncommitted changes, to avoid errors on checkout.
 
 Note that this will probably change soon, to allow for more flexible use of content from the git repository.
 
+Developing Tut
+==============
+
+Making a Release
+----------------
+
+When you're ready to make a release, bumpversion_ will handle incrementing the version, tagging, and updating NEWS.
+
+::
+
+  $ bumpversion <level>
+  $ git push
+  $ git push --tags
+
 
 .. _`Effective Django`: http://www.effectivedjango.com/
 .. _Sphinx: http://sphinx-doc.org/
